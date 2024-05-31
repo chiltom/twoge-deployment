@@ -152,6 +152,8 @@ Now, a policy can be added to the S3 bucket to allow access to the IAM Role.
 8. Scroll down to "Connected compute resources" and click "Set up EC2 connection".
 9. In the "EC2 instance" dropdown, select the EC2 instance hosting the Twoge application. Then, click "Continue".
 10. Click "Set up".
+    > [!NOTE]
+    > By setting up the connection between the RDS and EC2 instances in this way, AWS automatically configures additional security groups for the two services to ensure that they can connect to each other.
 
 ### Set Up the Twoge Application
 
@@ -255,7 +257,13 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-Now, your Twoge application is successfully hosted at your EC2 instance's public IP address.
+Now, your Twoge application is successfully hosted at your EC2 instance's public IP address. Visit this address and ensure that the application loads successfully.
+
+### Test the RDS and EC2 Connection
+
+To ensure that the RDS and EC2 are communicating correctly, navigate to the "Twoges" tab of the application and create a new post.
+
+If the post registers successfully and displays on the page, then the RDS connection is established and working correctly.
 
 ### Create a Target Group
 
@@ -264,15 +272,16 @@ In order to use an Application Load Balancer to distribute traffic across the EC
 1. In the EC2 dashboard in the AWS Management Console, click "Target groups" in the navigation sidebar.
 2. Click "Create target group".
 3. For the configuration, use the following values:
-  - Target type: Select "Instances".
-  - Target group name: Give the target group a unique name, like "twoge-TG".
-  - Protocol: Port: Leave the default of "HTTP: 80".
-  - IP address type: Leave the default of "IPv4".
-  - VPC: Select the VPC for the Twoge application.
-  - Protocol version: Leave the default value of "HTTP1".
-  - Click "Next".
-  - Register targets: Select the EC2 instance hosting the Twoge application, and click "Include as pending below".
-  - Click "Create target group".
+
+- Target type: Select "Instances".
+- Target group name: Give the target group a unique name, like "twoge-TG".
+- Protocol: Port: Leave the default of "HTTP: 80".
+- IP address type: Leave the default of "IPv4".
+- VPC: Select the VPC for the Twoge application.
+- Protocol version: Leave the default value of "HTTP1".
+- Click "Next".
+- Register targets: Select the EC2 instance hosting the Twoge application, and click "Include as pending below".
+- Click "Create target group".
 
 ### Create the Application Load Balancer
 
@@ -280,13 +289,15 @@ In order to use an Application Load Balancer to distribute traffic across the EC
 2. Click "Create load balancer" in the upper right-hand corner.
 3. Under "Application Load Balancer", click "Create".
 4. For the ALB, use the following configuration:
-  - Load balancer name: Use a unique name for the load balancer, such as "twoge-alb".
-  - Scheme: Leave default value of "Internet-facing".
-  - IP address type: Leave default of "IPv4".
-  - VPC: Select the VPC created for the Twoge application.
-  - Mappings: Select all availability zones that are available.
-  - Security groups: Remove the default security group and select the security group configured for the EC2 instance with SSH and HTTP inbound access, and all outbound traffic access.
-  - Listeners and routing: Leave the Protocol and Port values alone, but select the previously created target group for the "Default action" dropdown.
+
+- Load balancer name: Use a unique name for the load balancer, such as "twoge-alb".
+- Scheme: Leave default value of "Internet-facing".
+- IP address type: Leave default of "IPv4".
+- VPC: Select the VPC created for the Twoge application.
+- Mappings: Select all availability zones that are available.
+- Security groups: Remove the default security group and select the security group configured for the EC2 instance with SSH and HTTP inbound access, and all outbound traffic access.
+- Listeners and routing: Leave the Protocol and Port values alone, but select the previously created target group for the "Default action" dropdown.
+
 5. Leave all other values alone, and click "Create load balancer".
 
 Now, the ALB will be provisioned and created by AWS. Once completed, you will be able to visit the DNS name for the load balancer and see it loads the application, meaning that the load balancer is forwarding traffic correctly to the associated target group.
@@ -298,10 +309,72 @@ In order to create an Auto Scaling group for the Twoge application, an image and
 1. In the EC2 dashboard in the AWS Management Console, click "Instances" and select the Twoge application instance.
 2. In the "Actions" dropdown on the top of the page, click "Image and templates" and click "Create image".
 3. Configure the image as follows:
-  - Image name: Give the image a unique name, like "twoge-app-image".
-  - Image description: Optional, but it's good to give the image a description for later reference.
+
+- Image name: Give the image a unique name, like "twoge-app-image".
+- Image description: Optional, but it's good to give the image a description for later reference.
+
 4. Leave all other configurations as default, and click "Create image".
+5. Now, navigate back to the "Instances" tab from the navigation sidebar, and click the "Actions" dropdown, select "Image and templates", and click "Create template from instance".
+6. For configuration of the launch template:
 
+- Launch template name: Give the template a unique name, such as "twoge-application-template".
+- Template version description: Give the template a brief description for later reference.
+- Auto Scaling guidance: Check this box for added assistance in creating a template fit for an Auto Scaling Group.
+- AMI: Click on the "My AMIs" tab and select the twoge image just created.
+- Network Settings -> Subnet: Change the subnet to "Dont include in launch template". This ensure that the Auto Scaling Group can launch instances in multiple subnets for maximum availability.
+- Advanced details -> Shutdown behavior: Change this value to "Don't include in launch template".
+- Advanced details -> Stop - Hibernate behavior: Change this value to "Don't include in launch template".
 
+7. Once configured, click "Create launch template" in the "Summary" panel.
 
-### If error occurs, change nginx configuration to an elastic IP that needs to be created
+Now, a launch template with the Twoge application image has been created for later use. If desired, a new EC2 instance could be immediately launched from this template with all of the configurations and setups for the Twoge application that we have made so far. However, the next step is to create an Auto Scaling Group so that AWS handles this for us.
+
+### Create the ASG
+
+1. In the EC2 dashboard, click "Auto Scaling Groups" in the navigation sidebar.
+2. Click "Create Auto Scaling group".
+3. Use the following configuration:
+
+- Auto Scaling group name: Give the ASG a unique name, such as "twoge-ASG".
+- Launch template: Select the launch template that was just created and click "Next".
+- VPC: Select the twoge application VPC.
+- Availability Zones and subnets: Select the two public subnets available (not the RDS subnet) and click "Next".
+- Load balancing: Select "Attach to an existing load balancer".
+- Attach to an existing load balancer: Leave "Choose from your load balancer target groups" selected and select the Target Group created for the Twoge application from the dropdown.
+  > [!NOTE]
+  > This Target Group is already associated with our Application Load Balancer so, as a result, the Load Balancer is automatically associated with it as well.
+- Click "Next" at the bottom of this page.
+- Desired capacity: Increase this to 2 instances.
+- Min desired capacity: Leave the default value of 1.
+- Max desired capacity: Increase this to 4 instances.
+- Automatic scaling: Select "Target tracking scaling policy".
+- Scaling policy name: Give the policy a meaningful name, like "CPU utilization policy".
+- Metric type: Leave the default of "Average CPU utilization".
+- Target value: Increase this to 70.
+- Scroll past all other defaults and click "Next".
+- Add notifications: Click "Add notification".
+- Click "Create a topic".
+- Send a notification to: Enter a SNS topic name, such as "twoge-scaling"
+- With these recipients: Enter your email address.
+- Leave all other defaults checked and click "Next".
+- Click "Next" again.
+- Scroll down and click "Create Auto Scaling group".
+
+1. Navigate back to the EC2 Dashboard in the AWS Management Console and select the original EC2 instance that was manually configured.
+
+- Shut this instance down, the Auto Scaling Group will now handle the Twoge Application instances.
+
+2. To see if the ASG is behaving correctly and the ALB is communicating with it, navigate to the ALB's DNS name and ensure that the application loads successfully.
+
+- If so, the application will load as expected.
+
+### Testing SNS
+
+SNS will automatically send emails to the correct email address when a server is shut down. 
+
+> [!CAUTION]
+> Before testing this, ensure that you visit the email address entered in the SNS topic recipient and accept the subscription. If the subscription is not accepted, you will not receive emails pertaining to the scaling policy.
+
+1. In the EC2 Dashboard of the AWS Management Console, select one of the Twoge application instances. Go to the "Instance state" dropdown above and select "Stop instance".
+
+2. Check the email entered for the SNS topic and ensure that an email was received 
