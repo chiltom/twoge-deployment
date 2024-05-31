@@ -9,12 +9,19 @@
 This assessment covers the first modules of the Code Platoon DevOps curriculum. This comprises of Amazon Web Services resources and services, including:
 
 - EC2 (Elastic Compute Cloud): To host the Twoge application.
+
 - S3 (Simple Storage Service): To store static files, such as images, videos, and other assets.
+
 - IAM (Identity and Access Management): To manage services' access and permissions to AWS resources.
+
 - VPC (Virtual Private Cloud): To create a secure and isolated network environment for the application.
+
 - ALB (Application Load Balancer): To distribute incoming traffic across multiple EC2 instances.
+
 - ASG (Auto Scaling Group): To automatically scale EC2 instances up or down based on the demand.
+
 - SNS (Simple Notification Service): To receive notifications about your application's performance and health.
+
 - RDS (Relational Database Service): To host the database for the application.
 
 The goal of this assessment is to deploy the Twoge application to AWS using AWS' many services and their respective advantages. The [source code is located here](https://github.com/chandradeoarya/twoge).
@@ -56,3 +63,11 @@ git clone https://github.com/chandradeoarya/twoge
 [**12. Create the ASG**](./docs/asg-creation.md): Create the Auto Scaling Group to both scale in and scale out the Twoge application.
 
 [**13. Test SNS**](./docs/testing-sns.md): Ensure that SNS scaling notifications work correctly.
+
+## Attribution
+
+The Code Platoon DevOps Instructors have done a phenomenal job teaching us the basics and fundamentals of AWS services and resources, allowing us to successfully complete this assessment using networking, security, reliability, and scalability best practices.
+
+The Twoge application was created for the Code Platoon DevOps curriculum, by the Instructors, and is purely educational. This application and program is strictly prohibited for use in a commercial or solicitation setting.
+
+<div align="center">&copy; Code Platoon 2024</div>
