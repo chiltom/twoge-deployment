@@ -72,4 +72,9 @@ git clone https://github.com/chandradeoarya/twoge
     - Trusted entity type: Leave the default "AWS service".
     - Use case: Select "EC2" for the "Service or use case" dropdown.
     - Leave "EC2" selected. Click "Next" in the lower right-hand corner.
-    - 
+    - Type "AmazonS3FullAccess" in the search bar underneath "Permissions policies". Check the box next to it and select "Next" in the lower right-hand corner.
+    - Under "Role details" enter a unique name and a short description for the role.
+    - Leave all other values as default, and click "Create role" in the bottom right-hand corner of the page.
+
+### Launch the EC2 Instance
+
