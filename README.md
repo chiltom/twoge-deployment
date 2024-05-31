@@ -78,3 +78,34 @@ git clone https://github.com/chandradeoarya/twoge
 
 ### Launch the EC2 Instance
 
+1. Navigate to the EC2 service in the AWS Management Console.
+2. Click "Instances" in the navigation sidebar.
+3. Click "Launch instances" in the upper right-hand corner.
+4. Configure your EC2 instance in the following way:
+    - Name: Give your EC2 instance a unique name.
+    - Application and OS Images: Select "Amazon Linux" under the Quick Start tab, and select "Amazon Linux 2 AMI" under Amazon Machine Image.
+    - Instance type: Leave the default "t2.micro".
+    - Key pair: Select your existing key pair or create a new RSA key and select it here to be able to SSH into the instance.
+    - Network settings: Click "Edit" in the upper right-hand corner:
+        - VPC: Select the VPC that was created earlier in this process.
+        - Subnet: Select one of your public subnets. Note which subnet it is in.
+        - Auto-assign public ID: Make sure that this setting is enabled for internet access from the EC2 instance.
+        - Firewall (security groups): Select or configure a security group that allows for both SSH connection from your machine's IP address and HTTP requests from all IP addresses (0.0.0.0/0).
+    - Leave all other values as default and select "Launch instance" in the right-hand summary panel.
+5. Select "View all instances" in the bottom right-hand corner of the page.
+
+### Set Up the Twoge Application
+
+1. Click the checkbox for the new twoge application instance that was created.
+2. Click the "Connect" box among the options on the top of the page.
+3. Click on the "SSH client" tab and follow the steps to connect to the instance. An example is:
+```shell
+cd <LOCATION-OF-MY-KEY>
+chmod 400 <MY-KEY.pem>
+ssh -i <MY-KEY.pem> ec2-user@<INSTANCE-PUBLIC-IP>
+```
+> [!TIP]
+> The console may display a warning regarding the fact that the IP address is unknown and that it does not know the authenticity of it. This is due to the fact that the IP address is new to your machine's known hosts. If the IP address is the correct one from your EC2's public IP address, type "yes" and the IP address will be added to your machine's known hosts. It will then connect to the instance.
+4. Once
+
+### CREATE AN IMAGE FROM THE EXISTING EC2 AND SELECT THAT AMI FROM THE LAUNCH TEMPLATE
