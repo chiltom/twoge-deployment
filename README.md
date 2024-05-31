@@ -17,6 +17,11 @@ This assessment covers the first modules of the Code Platoon DevOps curriculum. 
 
 The goal of this assessment is to deploy the Twoge application to AWS using AWS' many services and their respective advantages. The [source code is located here](https://github.com/chandradeoarya/twoge).
 
+Clone the code into your local machine for certain portions of this assessment with the following command:
+```shell
+git clone https://github.com/chandradeoarya/twoge
+```
+
 ## Steps for Accomplishment
 
 ### Create the VPC
@@ -40,3 +45,31 @@ The goal of this assessment is to deploy the Twoge application to AWS using AWS'
 
 > [!NOTE]
 > Note the other resources that are created by this VPC launch wizard. It creates an internet gateway, attaches it to the VPC for internet access, creates a route table along with its routes, and associates it with the public subnets. This is important to understanding the architecture and communication of the VPC and all of its internal components.
+
+### Create the S3 Bucket
+
+1. Go to the S3 service in the AWS Management Console.
+2. Click on "Create bucket".
+3. Configure the S3 bucket as such:
+    - Bucket type: Leave the default value of "General purpose".
+    - Bucket name: Give the bucket a unique name.
+    - Object Ownership: Leave the default value of "ACLs disabled". An IAM role will be configured in the next step to allow public access of the S3 bucket.
+    - Block Public Access settings for this bucket: Leave the default value of "Block *all* public access" enabled. The S3 endpoint attached to the VPC along with the IAM role for access will allow our VPC to access this S3 bucket.
+    - Bucket Versioning: Leave this disabled.
+    - Default encryption: Leave these values as default.
+4. Click "Create bucket" once it is configured.
+5. Click on the name of your new S3 bucket in the S3 dashboard.
+6. Click "Upload" in the upper right hand corner of the S3 bucket.
+7. Click "Add Folder" and select the `static` folder within the `twoge` application on your local machine. Click "upload".
+8. Finally, select "Upload" in the AWS Management Console to upload the selected files to the S3 bucket.
+
+### Create the IAM Role for S3
+
+1. Navigate to the IAM service in the AWS Management Console.
+2. Select "Roles" from the navigation sidebar.
+3. Select "Create role" in the upper right-hand corner.
+4. Configure the role in the following way:
+    - Trusted entity type: Leave the default "AWS service".
+    - Use case: Select "EC2" for the "Service or use case" dropdown.
+    - Leave "EC2" selected. Click "Next" in the lower right-hand corner.
+    - 
