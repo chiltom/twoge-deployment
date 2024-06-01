@@ -38,6 +38,10 @@ sudo systemctl enable nginx
 
 6. Create a wsgi.py file in the twoge directory and add the following lines to it:
 
+```shell
+sudo vim wsgi.py
+```
+
 ```python
 from app import app
 

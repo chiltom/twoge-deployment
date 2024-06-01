@@ -32,6 +32,12 @@ Clone the code into your local machine for certain portions of this assessment w
 git clone https://github.com/chandradeoarya/twoge
 ```
 
+## Architecture
+
+<img src="./assets/twoge-deployment.png" width="800px" height="800px" />
+
+
+
 ## Steps for Accomplishment
 
 [**1. Create the VPC**](./docs/vpc-creation.md): Creates the VPC required to house and connect all required AWS services and resources.
