@@ -36,7 +36,30 @@ git clone https://github.com/chandradeoarya/twoge
 
 <img src="./assets/twoge-deployment.png" width="800px" height="800px" />
 
+This architecture diagram illustrates the entirety of all AWS resources and services that are used to host the Twoge application. 
 
+- Outside of the VPC is an S3 bucket that houses all of the application's static assets, such as images and videos. 
+    - This S3 bucket blocks all public access, but the individual EC2 instances hosting the Twoge application can access it. This is possible due to a bucket policy allowing a specific IAM role to have full access to it, and each EC2 instance assuming that IAM role when it is launched.
+
+- The VPC houses all of the other AWS resources. 
+    - Directly attached to this VPC is an internet gateway and a VPC endpoint. The internet gateway allows internet traffic in and out of the VPC, and the VPC endpoint is created specifically to access the S3 bucket for the Twoge application.
+    - The VPC hosts two public subnets a private subnet, and an Application Load Balancer (ALB). Traffic is routed to these subnets and ALB using a route table, noted on the diagram as "Public Route Table".
+
+- An Application Load Balancer (ALB) sits inside of the VPC and forwards all internet traffic to EC2 instances.
+    - It chooses which compute instance to forward traffic to depending on a number of factors, including the amount of incoming traffic, instance utilization, and more.
+
+- A Network Access Control List (NACL) sits outside of the subnets and ensures that only traffic in compliance with its ruleset is allowed in and out of each subnet.
+
+- In each availability zone, a public subnet hosts a number of EC2 instances.
+    - These EC2 instances are managed by an Auto Scaling Group. This Auto Scaling Group ensures that EC2 instances are shut down when CPU utilization falls under a 70% threshold (scaled in), and launched when CPU utilization of instances go beyond 70% (scaled out).
+
+- Each EC2 instance is wrapped by two Security Groups. 
+    - The main security group allows inbound SSH traffic from my IP address and inbound HTTP requests on port 80. All outbound traffic is permitted.
+    - The other security group explicitly allows only traffic on port 5432 in and out to the RDS Postgres database in the private subnet. This is the most secure way to ensure that the RDS instance is not compromised.
+
+- The private subnet houses an RDS instance with the PostgreSQL engine.
+    - This RDS instance has one Security Group allowing only inbound and outbound traffic on port 5432 to EC2 instances in the public subnets.
+    - Traffic between the RDS instance and EC2 instances is routed through another route table with no link to the internet gateway, depicted in the diagram as "Private Route Table".
 
 ## Steps for Accomplishment
 
