@@ -93,6 +93,8 @@ This architecture diagram illustrates the entirety of all AWS resources and serv
 
 [**13. Test SNS**](./docs/testing-sns.md): Ensure that SNS scaling notifications work correctly.
 
+[**14. Testing the ASG**](./docs/stress-test.md): Test that the ASG scales due to CPU utilization metric.
+
 ## Attribution
 
 The Code Platoon DevOps Instructors have done a phenomenal job teaching us the basics and fundamentals of AWS services and resources, allowing us to successfully complete this assessment using networking, security, reliability, and scalability best practices.
